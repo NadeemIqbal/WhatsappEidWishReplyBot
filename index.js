@@ -1,30 +1,5 @@
-// const app = require("express")();
-// const http = require("http").createServer(app);
-// const bodyParser = require("body-parser");
-// var cors = require("cors");
-// const { Server } = require("socket.io");
-// const io = new Server(http);
-
-// var events = require('events');
-
-// //create an object of EventEmitter class by using above reference
-// var em = new events.EventEmitter();
-
-// const express = require("express");
-// const {venom} = require('../Whatsapp bot/venom-config');
 const venom = require("venom-bot");
 const { timeStamp } = require("console");
-
-// var corsOptions = {
-//   origin: "*",
-//   //methods: ["GET", "POST", "PUT"],
-//   credentials: true,
-// };
-
-// app.use(cors(corsOptions));
-// app.use(express.static(__dirname + "/img"));
-// app.use(bodyParser.urlencoded({ extended: false })); // we are not dealing with complex object so extended : false
-// app.use(bodyParser.json());
 
 venom
   .create({
@@ -74,71 +49,6 @@ venom
 
 function start(client) {
   console.log("EID WISHER BOT ", client);
-
-  const newMsgs = getAllNewMsgs()
-    .then((res) => {
-      for (let i = 0; i < res.length; i++) {
-        if (i < 20)
-          if (res[i].isGroup == false && !isAlreadyWished(res[i])) {
-            sendMessageToWhatsapp(
-              res[i].lastReceivedKey.remote._serialized,
-              "Khair Mubarak!"
-            );
-            // client.sendSeen(res[i].id);
-            // console.log("Seen Sent:", res[i].id);
-          }
-      }
-    })
-    .catch((err) => {
-      console.log("found error");
-    });
-
-  function isAlreadyWished(msg) {
-    if (
-      // msg.lastReceivedKey.fromMe == false && // last msg in this chat is not from me
-      haveIWishedInLastXDays(msg, 1) // no wish msg from me in this chat in last 1 day
-    ) {
-      console.log("ALREADY WISHED: ", msg.lastReceivedKey.remote._serialized);
-      return true;
-    }
-
-    console.log("NOT ALREADY WISHED: ", msg.lastReceivedKey.remote._serialized);
-    return false;
-  }
-
-  function haveIWishedInLastXDays(msg, days) {
-    console.log("message id ", msg.id._serialized);
-
-    const dateOneDayBefore =
-      new Date().setDate(new Date().getDate() - days) / 1000;
-
-    console.log("dateOneDayBefore ", dateOneDayBefore);
-
-    client
-      .getAllMessagesInChat(msg.id._serialized)
-      .then((result) => {
-        console.log("ALL MESSAGES OF CHAT: ", result);
-
-        // filtering results here to number of days
-        for (let i = 0; i < result.length; i++) {
-          if (result[i].timestamp > dateOneDayBefore) {
-            // msg is from last 1 day
-            if (result[i].body.toUpperCase().includes("KHAIR MUBARAK")) {
-              console.log(
-                "KHAIR MUBARAK FOUND, so skipping this chat: ",
-                msg.name
-              );
-              return true;
-            }
-          }
-        }
-        return false;
-      })
-      .catch((err) => {
-        console.log("error retrieving messages :: ", err);
-        return false;
-      });
-  }
 
   client.onMessage((message) => {
     console.log("Message: ", message);
@@ -202,9 +112,5 @@ function start(client) {
       return true;
     }
     return false;
-  }
-
-  async function getAllNewMsgs() {
-    return await client.getAllChats();
   }
 }
